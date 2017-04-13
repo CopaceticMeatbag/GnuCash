@@ -287,10 +287,18 @@
                             </div>
                         </div>
                     </div>
+					<div class="col-lg-12">
+						<div id="pieChart" style="width:600px;height:300px"></div>
+					</div>
                 </div>
+				
                 <!-- /.row -->
+				<div class="row">
+					
+				</div>
 
             </div>
+			
             <!-- /.container-fluid -->
 
         </div>
@@ -305,21 +313,22 @@
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
 	
-	<!-- FLot Charts JavaScript -->
-	<script src="js/plugins/flot/excanvas.min.js"></script>
+	<!-- Flot Charts JavaScript -->
 	<script src="js/plugins/flot/jquery.flot.js"></script>
-	<script src="js/plugins/flot/flot-data.js"></script>
+	<script src="js/plugins/flot/jquery.flot.pie.js"></script>
 	
     <!-- Morris Charts JavaScript -->
     <script src="js/plugins/morris/raphael.min.js"></script>
     <script src="js/plugins/morris/morris.min.js"></script>
     <script src="js/plugins/morris/morris-data.js"></script>
 	
-	<!-- Generate data from PostgreSQL, ready for Morris Charts/Graphs to use -->
+	<!-- Generate data from PostgreSQL, ready for Morris and Flot Charts/Graphs -->
 	<!-- Generate Bargraph Array -->
 	<?php
 	$bargraph_inner_array = array();
 	$bargraph_array = array();
+	$piegraph_inner_array = array();
+	$piegraph_array = array();
 	$emptyParentGUID = "74a4f183da91fccda3bcef482a5cc821";
 	
 	#Iterate through the list of Expense Accounts 
@@ -339,9 +348,12 @@
 				
 				$bargraph_inner_array[account]=$account[1];#\n$total_value
 				$bargraph_inner_array[value]=$total_value;
+				$piegraph_inner_array[label]=$account[1];
+				$piegraph_inner_array[data]=$total_value;
 				
 				#Add the array with the current account name + value to the main bargraph array.
 				$bargraph_array[] = $bargraph_inner_array;
+				$piegraph_array[] = $piegraph_inner_array;
 			}
 		}
 	}
@@ -352,9 +364,21 @@
 	?>
 	<!-- End Generate Bargraph Array -->
 	
-	<!-- Custom Morris Charts JavaScript -->
+	<!-- Generate Piechart Array -->
+	<?php
+	?>
+	<!-- End Generate Piechart Array -->
 	
+	<!-- Custom Flot Charts JavaScript -->
 	<script type="text/javascript">
+	$.plot('#pieChart',<?php echo json_encode($piegraph_array);?>, {
+    series: {
+        pie: {
+            show: true
+        }
+    }
+});
+	<!-- Custom Morris Charts JavaScript -->
 	Morris.Bar({
   element: 'expense-bar',
   data: <?php echo json_encode($bargraph_array);?>,
