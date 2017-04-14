@@ -32,7 +32,7 @@
 	
 	<!--Declare our PHP Database Connection-->
 	<?php
-	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=password";
+	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=postPASS101";
 	$dbconn = pg_connect($conn_string);
 	?>
 	
@@ -213,9 +213,7 @@
 									<h3 class="panel-title" style="text-align:center"><i class="fa fa-bank fa-fw"></i> Saved This Month <i class="fa fa-bank fa-fw"></i></h3>
 								</div>
 								<div class="panel-body" style="text-align:center">
-									<div class="canvas-holder">
-										<canvas width="250" height="125"></canvas>
-									</div>
+									<canvas id="monthlyBalance" height="213" width="320" style="display: block; width: 320px; height: 213px;"></canvas>
 								</div>
 							</div>
 						</div>
@@ -326,7 +324,7 @@
     <script src="js/plugins/morris/morris-data.js"></script>
 	
 	<!-- ChartJS Charts JavaScript -->
-    <script src="js/plugins/chartjs/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
 	
 	<script>
 	<!-- Generate data from PostgreSQL, ready for JSON accepting Charts/Graphs -->
@@ -365,32 +363,21 @@
 	});
 	?>
 	<!-- End Generate Bargraph Array -->
-	<?php
-	
-	?>
 	var data = {
-    labels: ["January", "February", "March", "April", "May", "June", "July"],
+    labels: ["Starting Balance", "Ending Balance"],
     datasets: [
         {
-            label: "My First dataset",
+            label: "",
             backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
+                '#334960',
+                '#f46524'
             ],
             borderColor: [
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
+                '#334960',
+                '#f46524'
             ],
             borderWidth: 1,
-            data: [65, 59, 80, 81, 56, 55, 40],
+            data: [22, 56],
         }
     ]
 };
@@ -406,6 +393,7 @@
   xLabelMargin: 7
 });
 	<!-- Custom ChartJS Charts JavaScript -->
+	var ctx = document.getElementById('monthlyBalance').getContext('2d');
 	var myBarChart = new Chart(ctx, {
     type: 'horizontalBar',
     data: data,
