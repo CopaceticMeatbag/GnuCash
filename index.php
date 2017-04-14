@@ -32,7 +32,7 @@
 	
 	<!--Declare our PHP Database Connection-->
 	<?php
-	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=postPASS101";
+	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=password";
 	$dbconn = pg_connect($conn_string);
 	?>
 	
@@ -160,16 +160,7 @@
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
                     <li class="active">
-                        <a href="index.html"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
-                    </li>
-                    <li>
-                        <a href="charts.html"><i class="fa fa-fw fa-bar-chart-o"></i> Charts</a>
-                    </li>
-                    <li>
-                        <a href="tables.html"><i class="fa fa-fw fa-table"></i> Tables</a>
-                    </li>
-                    <li>
-                        <a href="forms.html"><i class="fa fa-fw fa-edit"></i> Forms</a>
+                        <a href="index.php"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
                     </li>
                     <li>
                         <a href="pages/bootstrap-elements.html"><i class="fa fa-fw fa-desktop"></i> Bootstrap Elements</a>
@@ -189,10 +180,7 @@
                         </ul>
                     </li>
                     <li>
-                        <a href="blank-page.html"><i class="fa fa-fw fa-file"></i> Blank Page</a>
-                    </li>
-                    <li>
-                        <a href="index-rtl.html"><i class="fa fa-fw fa-dashboard"></i> RTL Dashboard</a>
+                        <a href="pages/blank-page.html"><i class="fa fa-fw fa-file"></i> Blank Page</a>
                     </li>
                 </ul>
             </div>
@@ -225,7 +213,9 @@
 									<h3 class="panel-title" style="text-align:center"><i class="fa fa-bank fa-fw"></i> Saved This Month <i class="fa fa-bank fa-fw"></i></h3>
 								</div>
 								<div class="panel-body" style="text-align:center">
-									placeholder1
+									<div class="canvas-holder">
+										<canvas width="250" height="125"></canvas>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -334,6 +324,10 @@
     <script src="js/plugins/morris/raphael.min.js"></script>
     <script src="js/plugins/morris/morris.min.js"></script>
     <script src="js/plugins/morris/morris-data.js"></script>
+	
+	<!-- ChartJS Charts JavaScript -->
+    <script src="js/plugins/chartjs/chart.js"></script>
+	
 	<script>
 	<!-- Generate data from PostgreSQL, ready for JSON accepting Charts/Graphs -->
 	<!-- Generate Bargraph Array -->
@@ -371,7 +365,35 @@
 	});
 	?>
 	<!-- End Generate Bargraph Array -->
+	<?php
 	
+	?>
+	var data = {
+    labels: ["January", "February", "March", "April", "May", "June", "July"],
+    datasets: [
+        {
+            label: "My First dataset",
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1,
+            data: [65, 59, 80, 81, 56, 55, 40],
+        }
+    ]
+};
 	<!-- Custom Morris Charts JavaScript -->
 	Morris.Bar({
   element: 'expense-bar',
@@ -383,7 +405,21 @@
   gridTextSize: 12,
   xLabelMargin: 7
 });
-
+	<!-- Custom ChartJS Charts JavaScript -->
+	var myBarChart = new Chart(ctx, {
+    type: 'horizontalBar',
+    data: data,
+    options: {
+        scales: {
+            xAxes: [{
+                stacked: true
+            }],
+            yAxes: [{
+                stacked: true
+            }]
+        }
+    }
+});
 
 	</script>
 
