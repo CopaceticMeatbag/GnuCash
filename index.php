@@ -210,17 +210,32 @@
 						<div class="col-lg-4">
 							<div class="panel panel-default">
 								<div class="panel-heading">
-									<h3 class="panel-title" style="text-align:center"><i class="fa fa-bank fa-fw"></i> Saved This Month <i class="fa fa-bank fa-fw"></i></h3>
+									<h3 class="panel-title" style="text-align:center"><i class="fa fa-bank fa-fw"></i><b> Saved This Month</b><i class="fa fa-bank fa-fw"></i></h3>
 								</div>
 								<div class="panel-body" style="text-align:center">
-									<canvas id="monthlyBalance" height="213" width="320" style="display: block; width: 320px; height: 213px;"></canvas>
+								<?php
+									$query = "SELECT
+												public.Accounts.guid,
+												public.Accounts.name,
+												public.Accounts.parent_guid,
+												SUM(public.Splits.value_num) AS total,
+												public.transactions.post_date
+												FROM public.Accounts
+												INNER JOIN public.Splits 
+													ON public.Accounts.guid=public.Splits.account_guid
+												INNER JOIN public.Transactions
+													ON public.Splits.tx_guid=public.Transactions.guid
+												WHERE public.Accounts.account_type = 'EXPENSE' AND date_trunc('month',public.Transactions.post_date) < date_trunc('month', CURRENT_DATE)
+												GROUP BY public.accounts.guid,public.accounts.name,public.accounts.parent_guid, public.Transactions.post_date";
+									$res_account_value_month = pg_query($pgconn,$query);
+								?>
 								</div>
 							</div>
 						</div>
 						<div class="col-lg-4">
 							<div class="panel panel-default">
 								<div class="panel-heading">
-									<h3 class="panel-title" style="text-align:center"><i class="fa fa-bank fa-fw"></i> Saved This Year <i class="fa fa-bank fa-fw"></i></h3>
+									<h3 class="panel-title" style="text-align:center"><i class="fa fa-bank fa-fw"></i><b> Saved This Year </b><i class="fa fa-bank fa-fw"></i></h3>
 								</div>
 								<div class="panel-body" style="text-align:center">
 									placeholder2
@@ -230,7 +245,7 @@
 						<div class="col-lg-4">
 							<div class="panel panel-default">
 								<div class="panel-heading">
-									<h3 class="panel-title" style="text-align:center"><i class="fa fa-bank fa-fw"></i> Total Saved <i class="fa fa-bank fa-fw"></i></h3>
+									<h3 class="panel-title" style="text-align:center"><i class="fa fa-bank fa-fw"></i><b> Total Saved </b><i class="fa fa-bank fa-fw"></i></h3>
 								</div>
 								<div class="panel-body" style="text-align:center">
 									placeholder3
@@ -241,7 +256,7 @@
 					<div class="row">
 						<div class="panel panel-default">
 							<div class="panel-heading">
-								<h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Expenses</h3>
+								<h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i><b> Monthly Expense Breakdown</b></h3>
 							</div>
 							<div class="panel-body">
 								<div id="expense-bar"></div>
@@ -255,7 +270,7 @@
 				<div class="col-lg-4">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h3 class="panel-title"><i class="fa fa-money fa-fw"></i> Transactions Panel</h3>
+                                <h3 class="panel-title"><i class="fa fa-money fa-fw"></i><b> Transactions Panel</b></h3>
                             </div>
                             <div class="panel-body">
                                 <div class="table-responsive">
@@ -266,6 +281,7 @@
 											echo("<tr><th>Date</th><th>Description</th><th>Amount</th></tr>");
 											echo("</thead>");
 											
+											#Select the Transaction GUID, PostDate, Description, and Value of each transaction.
 											$query = "SELECT public.Transactions.guid, public.Transactions.post_date, public.Transactions.description, public.Splits.value_num, public.Splits.value_denom
 											FROM public.Transactions
 											INNER JOIN public.Splits ON public.Transactions.guid=public.Splits.tx_guid
@@ -324,7 +340,7 @@
     <script src="js/plugins/morris/morris-data.js"></script>
 	
 	<!-- ChartJS Charts JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>-->
 	
 	<script>
 	<!-- Generate data from PostgreSQL, ready for JSON accepting Charts/Graphs -->
@@ -335,26 +351,28 @@
 	$emptyParentGUID = "74a4f183da91fccda3bcef482a5cc821";
 	
 	#Iterate through the list of Expense Accounts 
-	$query = "SELECT guid,name,parent_guid FROM public.accounts WHERE account_type = 'EXPENSE'";
+	$query = "SELECT
+	public.Accounts.guid,
+	public.Accounts.name,
+	public.Accounts.parent_guid,
+	SUM(public.Splits.value_num) AS total
+	FROM public.Accounts
+	INNER JOIN public.Splits 
+		ON public.Accounts.guid=public.Splits.account_guid
+    WHERE public.Accounts.account_type = 'EXPENSE'
+	GROUP BY public.accounts.guid,public.accounts.name,public.accounts.parent_guid";
 	$res_accounts_list = pg_query($dbconn, $query);
 	while ($account = pg_fetch_row($res_accounts_list)) {
 
 		#Find the total value of each account and add to array.
 		if($account[2] != $emptyParentGUID) {
-			$query = "SELECT SUM(value_num) FROM public.splits WHERE account_guid = ('$account[0]') AND value_num > 0";
-			$res_account_value = pg_query($dbconn, $query);
-			$value = pg_fetch_row($res_account_value);
-
-			#If the Expense Account isn't at $0, format and add to bargraph_inner_array.
-			if ($value[0] != NULL){
-				$total_value = (intval($value[0])/100);
-				
-				$bargraph_inner_array[account]=$account[1];
-				$bargraph_inner_array[value]=$total_value;
-				
-				#Add the array with the current account name + value to the main bargraph array.
-				$bargraph_array[] = $bargraph_inner_array;
-			}
+			$total_value = (intval($account[3])/100);
+			
+			$bargraph_inner_array[account]=$account[1];
+			$bargraph_inner_array[value]=$total_value;
+			
+			#Add the array with the current account name + value to the main bargraph array.
+			$bargraph_array[] = $bargraph_inner_array;
 		}
 	}
 	#Sort the Bar Graph Array in descending account value
@@ -363,24 +381,7 @@
 	});
 	?>
 	<!-- End Generate Bargraph Array -->
-	var data = {
-    labels: ["Starting Balance", "Ending Balance"],
-    datasets: [
-        {
-            label: "",
-            backgroundColor: [
-                '#334960',
-                '#f46524'
-            ],
-            borderColor: [
-                '#334960',
-                '#f46524'
-            ],
-            borderWidth: 1,
-            data: [22, 56],
-        }
-    ]
-};
+	
 	<!-- Custom Morris Charts JavaScript -->
 	Morris.Bar({
   element: 'expense-bar',
@@ -390,23 +391,8 @@
   labels: ['Account Value'],
   resize: true,
   gridTextSize: 12,
+  gridTextWeight: 'bold',
   xLabelMargin: 7
-});
-	<!-- Custom ChartJS Charts JavaScript -->
-	var ctx = document.getElementById('monthlyBalance').getContext('2d');
-	var myBarChart = new Chart(ctx, {
-    type: 'horizontalBar',
-    data: data,
-    options: {
-        scales: {
-            xAxes: [{
-                stacked: true
-            }],
-            yAxes: [{
-                stacked: true
-            }]
-        }
-    }
 });
 
 	</script>
