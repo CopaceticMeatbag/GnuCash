@@ -18,7 +18,7 @@
     <link href="css/sb-admin.css" rel="stylesheet">
 
     <!-- Morris Charts CSS -->
-    <!--<link href="css/plugins/morris.css" rel="stylesheet">-->
+    <link href="css/plugins/morris.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
     <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -216,22 +216,55 @@
                         </ol>
                     </div>
                 </div>
-                <!-- /.row -->
-                <div class="row">
-                    <div class="col-lg-8">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title"><i class="fa fa-long-arrow-right fa-fw"></i>Expenses</h3>
-                            </div>
-                            <div class="panel-body">
-                                <div id="expense-bar"></div>
-                                <div class="text-right">
-                                    <a href="#">View Details<i class="fa fa-arrow-circle-right"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
+				
+				<div class="col-lg-8">
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h3 class="panel-title" style="text-align:center"><i class="fa fa-bank fa-fw"></i> Saved This Month <i class="fa fa-bank fa-fw"></i></h3>
+								</div>
+								<div class="panel-body" style="text-align:center">
+									placeholder1
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h3 class="panel-title" style="text-align:center"><i class="fa fa-bank fa-fw"></i> Saved This Year <i class="fa fa-bank fa-fw"></i></h3>
+								</div>
+								<div class="panel-body" style="text-align:center">
+									placeholder2
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h3 class="panel-title" style="text-align:center"><i class="fa fa-bank fa-fw"></i> Total Saved <i class="fa fa-bank fa-fw"></i></h3>
+								</div>
+								<div class="panel-body" style="text-align:center">
+									placeholder3
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Expenses</h3>
+							</div>
+							<div class="panel-body">
+								<div id="expense-bar"></div>
+								<div class="text-right">
+									<a href="#">View Details<i class="fa fa-arrow-circle-right"></i></a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h3 class="panel-title"><i class="fa fa-money fa-fw"></i> Transactions Panel</h3>
@@ -244,7 +277,11 @@
 											echo("<thead class='thead-default'>");
 											echo("<tr><th>Date</th><th>Description</th><th>Amount</th></tr>");
 											echo("</thead>");
-											$query = "select guid,post_date,description from public.transactions ORDER BY post_date DESC";
+											
+											$query = "SELECT public.Transactions.guid, public.Transactions.post_date, public.Transactions.description, public.Splits.value_num, public.Splits.value_denom
+											FROM public.Transactions
+											INNER JOIN public.Splits ON public.Transactions.guid=public.Splits.tx_guid
+											ORDER BY public.transactions.post_date DESC";
 											$res_trans = pg_query($dbconn, $query);
 											echo("<tbody>");
 											
@@ -252,28 +289,16 @@
 											while ($row = pg_fetch_row($res_trans)) {
 												
 												#Start new table row (aka new transaction)
+												#Enter row details, for value only show the positive values for each account (splits is balanced with positive + negative transactions)
 												echo("<tr>");
-												$date = date('Y-m-d', strtotime($row[1]));
-												#Add the values we have already (Date and Description)
-												echo("<td>$date</td>");
-												echo("<td>$row[2]</td>");
-												
-												#Get the value for the transation
-												$query = "select value_num,value_denom from public.splits WHERE tx_guid = ('$row[0]')";
-												
-												#res_splits now contains a list of values for each transaction
-												$res_splits = pg_query($dbconn,$query);
-												
-												#Grab the value and add it to the current table row
-												while ($sec_row = pg_fetch_row($res_splits)) {
-													
-													#Only show the positive values for each account (splits is balanced with positive + negative transactions)
-													$value = $sec_row[0]/$sec_row[1];
-													if ((int)$value > 0){
-														echo("<td>$$value</td>");
-													}
+												$date = date('Y-m-d', strtotime($row[1]));	
+												$value = $row[3]/$row[4];
+												if ((int)$value > 0){
+													echo("<td>$date</td>");
+													echo("<td>$row[2]</td>");
+													echo("<td>$$value</td>");
 												}
-												#Move on to next row
+												#End of row
 												echo("</tr>\n");
 											}
 											echo("</tbody>");
@@ -287,18 +312,10 @@
                             </div>
                         </div>
                     </div>
-					<div class="col-lg-12">
-						<div id="pieChart" style="width:600px;height:300px"></div>
-					</div>
-                </div>
 				
                 <!-- /.row -->
-				<div class="row">
-					
-				</div>
 
             </div>
-			
             <!-- /.container-fluid -->
 
         </div>
@@ -313,22 +330,16 @@
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
 	
-	<!-- Flot Charts JavaScript -->
-	<script src="js/plugins/flot/jquery.flot.js"></script>
-	<script src="js/plugins/flot/jquery.flot.pie.js"></script>
-	
     <!-- Morris Charts JavaScript -->
     <script src="js/plugins/morris/raphael.min.js"></script>
     <script src="js/plugins/morris/morris.min.js"></script>
     <script src="js/plugins/morris/morris-data.js"></script>
-	
-	<!-- Generate data from PostgreSQL, ready for Morris and Flot Charts/Graphs -->
+	<script>
+	<!-- Generate data from PostgreSQL, ready for JSON accepting Charts/Graphs -->
 	<!-- Generate Bargraph Array -->
 	<?php
 	$bargraph_inner_array = array();
 	$bargraph_array = array();
-	$piegraph_inner_array = array();
-	$piegraph_array = array();
 	$emptyParentGUID = "74a4f183da91fccda3bcef482a5cc821";
 	
 	#Iterate through the list of Expense Accounts 
@@ -346,38 +357,21 @@
 			if ($value[0] != NULL){
 				$total_value = (intval($value[0])/100);
 				
-				$bargraph_inner_array[account]=$account[1];#\n$total_value
+				$bargraph_inner_array[account]=$account[1];
 				$bargraph_inner_array[value]=$total_value;
-				$piegraph_inner_array[label]=$account[1];
-				$piegraph_inner_array[data]=$total_value;
 				
 				#Add the array with the current account name + value to the main bargraph array.
 				$bargraph_array[] = $bargraph_inner_array;
-				$piegraph_array[] = $piegraph_inner_array;
 			}
 		}
 	}
-	#Sort the array in descending account value
+	#Sort the Bar Graph Array in descending account value
 	usort($bargraph_array, function($b, $a) {
 		return $a['value'] - $b['value'];
 	});
 	?>
 	<!-- End Generate Bargraph Array -->
 	
-	<!-- Generate Piechart Array -->
-	<?php
-	?>
-	<!-- End Generate Piechart Array -->
-	
-	<!-- Custom Flot Charts JavaScript -->
-	<script type="text/javascript">
-	$.plot('#pieChart',<?php echo json_encode($piegraph_array);?>, {
-    series: {
-        pie: {
-            show: true
-        }
-    }
-});
 	<!-- Custom Morris Charts JavaScript -->
 	Morris.Bar({
   element: 'expense-bar',
@@ -387,7 +381,7 @@
   labels: ['Account Value'],
   resize: true,
   gridTextSize: 12,
-  xLabelMargin: 9
+  xLabelMargin: 7
 });
 
 
