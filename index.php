@@ -316,7 +316,7 @@
 									<?php
 										echo("<thead>");
 										echo("<tr>
-										<th class='col-xs-3'>Date</th><th class='col-xs-7'>Description</th><th class='col-xs-2'>Amount</th></tr>");
+										<th>Date</th><th>Description</th><th>Amount</th></tr>");
 										echo("</thead>");
 										
 										#Select the Transaction GUID, PostDate, Description, and Value of each transaction.
@@ -336,15 +336,14 @@
 											$date = date('Y-m-d', strtotime($row[1]));	
 											$value = $row[3]/$row[4];
 											if ((int)$value > 0){
-												echo("<td class='col-xs-3'>$date</td>");
-												echo("<td class='col-xs-7'>$row[2]</td>");
-												echo("<td class='col-xs-2'>$$value</td>");
+												echo("<td>$date</td>");
+												echo("<td>$row[2]</td>");
+												echo("<td>$$value</td>");
 											}
 											#End of row
 											echo("</tr>\n");
 										}
 										echo("</tbody>");
-										echo("</table>");
 									?>
 								</table>
 							</div>

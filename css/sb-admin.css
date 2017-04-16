@@ -249,5 +249,5 @@ tbody td, thead th {
     width: 140px;
 }
 thead th:last-child {
-    width: 156px; /* 140px + 16px scrollbar width */
+    width: 140px; /* 140px + 16px scrollbar width */
 }
