@@ -6,10 +6,10 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="description" content="Prettier GnuCash">
+    <meta name="author" content="Mike A">
 
-    <title>SB Admin - Bootstrap Admin Template</title>
+    <title>GnuCash Accounting</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -32,7 +32,7 @@
 	
 	<!--Declare our PHP Database Connection-->
 	<?php
-	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=password";
+	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=postPASS101";
 	$dbconn = pg_connect($conn_string);
 	?>
 	
@@ -138,7 +138,7 @@
                     </ul>
                 </li>
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> Mike Anthony <b class="caret"></b></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> S0ULphIRE <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li>
                             <a href="#"><i class="fa fa-fw fa-user"></i> Profile</a>
@@ -197,11 +197,6 @@
                         <h1 class="page-header">
                             Dashboard <small>Finance Overview</small>
                         </h1>
-                        <ol class="breadcrumb">
-                            <li class="active">
-                                <i class="fa fa-dashboard"></i> Dashboard
-                            </li>
-                        </ol>
                     </div>
                 </div>
 				
@@ -210,24 +205,29 @@
 						<div class="col-lg-4">
 							<div class="panel panel-default">
 								<div class="panel-heading">
-									<h3 class="panel-title" style="text-align:center"><i class="fa fa-bank fa-fw"></i><b> Saved This Month</b><i class="fa fa-bank fa-fw"></i></h3>
+									<h3 class="panel-title" style="text-align:center"><i class="fa fa-bank fa-fw"></i><b> Saved This Month  </b><i class="fa fa-bank fa-fw"></i></h3>
 								</div>
-								<div class="panel-body" style="text-align:center">
+								<div class="panel-body money-saved">
 								<?php
-									$query = "SELECT
-												public.Accounts.guid,
-												public.Accounts.name,
-												public.Accounts.parent_guid,
-												SUM(public.Splits.value_num) AS total,
-												public.transactions.post_date
-												FROM public.Accounts
-												INNER JOIN public.Splits 
-													ON public.Accounts.guid=public.Splits.account_guid
-												INNER JOIN public.Transactions
-													ON public.Splits.tx_guid=public.Transactions.guid
-												WHERE public.Accounts.account_type = 'EXPENSE' AND date_trunc('month',public.Transactions.post_date) < date_trunc('month', CURRENT_DATE)
-												GROUP BY public.accounts.guid,public.accounts.name,public.accounts.parent_guid, public.Transactions.post_date";
-									$res_account_value_month = pg_query($pgconn,$query);
+									$query = "Select SUM(Total) from (Select 
+												  Sum(splits.value_num) as Total, 
+												  accounts.account_type 
+												From 
+												  splits Inner Join 
+												  accounts On accounts.guid = splits.account_guid Inner Join 
+												  transactions On splits.tx_guid = transactions.guid 
+												Where 
+												  transactions.post_date >= date_trunc('month', CURRENT_DATE) 
+												Group By 
+												  accounts.account_type 
+												Having 
+												  accounts.account_type Not In ('EXPENSE', 'INCOME') 
+												Order By 
+												  accounts.account_type ) as TotalSaved";
+									$res_account_value_month = pg_query($dbconn,$query);
+									$MonthlyGainz = pg_fetch_row($res_account_value_month);
+									$MonthlyGainz = (intval($MonthlyGainz[0])/100);
+									echo("<p>$$MonthlyGainz</p>");
 								?>
 								</div>
 							</div>
@@ -237,8 +237,28 @@
 								<div class="panel-heading">
 									<h3 class="panel-title" style="text-align:center"><i class="fa fa-bank fa-fw"></i><b> Saved This Year </b><i class="fa fa-bank fa-fw"></i></h3>
 								</div>
-								<div class="panel-body" style="text-align:center">
-									placeholder2
+								<div class="panel-body money-saved">
+								<?php
+									$query = "Select SUM(Total) from (Select 
+												  Sum(splits.value_num) as Total, 
+												  accounts.account_type 
+												From 
+												  splits Inner Join 
+												  accounts On accounts.guid = splits.account_guid Inner Join 
+												  transactions On splits.tx_guid = transactions.guid 
+												Where 
+												  transactions.post_date >= date_trunc('year', CURRENT_DATE) 
+												Group By 
+												  accounts.account_type 
+												Having 
+												  accounts.account_type Not In ('EXPENSE', 'INCOME') 
+												Order By 
+												  accounts.account_type ) as TotalSaved";
+									$res_account_value_year = pg_query($dbconn,$query);
+									$YearlyGainz = pg_fetch_row($res_account_value_year);
+									$YearlyGainz = (intval($YearlyGainz[0])/100);
+									echo("<p>$$YearlyGainz</p>");
+								?>
 								</div>
 							</div>
 						</div>
@@ -247,8 +267,26 @@
 								<div class="panel-heading">
 									<h3 class="panel-title" style="text-align:center"><i class="fa fa-bank fa-fw"></i><b> Total Saved </b><i class="fa fa-bank fa-fw"></i></h3>
 								</div>
-								<div class="panel-body" style="text-align:center">
-									placeholder3
+								<div class="panel-body money-saved">
+								<?php
+									$query = "Select SUM(Total) from (Select 
+												  Sum(splits.value_num) as Total, 
+												  accounts.account_type 
+												From 
+												  splits Inner Join 
+												  accounts On accounts.guid = splits.account_guid Inner Join 
+												  transactions On splits.tx_guid = transactions.guid  
+												Group By 
+												  accounts.account_type 
+												Having 
+												  accounts.account_type Not In ('EXPENSE', 'INCOME') 
+												Order By 
+												  accounts.account_type ) as TotalSaved";
+									$res_account_value_total = pg_query($dbconn,$query);
+									$TotalGainz = pg_fetch_row($res_account_value_total);
+									$TotalGainz = (intval($TotalGainz[0])/100);
+									echo("<p>$$TotalGainz</p>");
+								?>
 								</div>
 							</div>
 						</div>
@@ -261,61 +299,61 @@
 							<div class="panel-body">
 								<div id="expense-bar"></div>
 								<div class="text-right">
-									<a href="#">View Details<i class="fa fa-arrow-circle-right"></i></a>
+									<a href="../pages/blank-page.html">View Details<i class="fa fa-arrow-circle-right"></i></a>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 				<div class="col-lg-4">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title"><i class="fa fa-money fa-fw"></i><b> Transactions Panel</b></h3>
-                            </div>
-                            <div class="panel-body">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-hover table-striped">
-                                        <?php
-											echo("<table class='table table-striped table-hover table-responsive' border=2>\n");
-											echo("<thead class='thead-default'>");
-											echo("<tr><th>Date</th><th>Description</th><th>Amount</th></tr>");
-											echo("</thead>");
+                    <div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title"><i class="fa fa-money fa-fw"></i><b> Transactions Panel </b></h3>
+						</div>
+						<div class="panel-body">
+							<div class="table-responsive">
+								<table class="table table-bordered table-hover table-striped">
+									<?php
+										echo("<thead>");
+										echo("<tr>
+										<th class='col-xs-3'>Date</th><th class='col-xs-7'>Description</th><th class='col-xs-2'>Amount</th></tr>");
+										echo("</thead>");
+										
+										#Select the Transaction GUID, PostDate, Description, and Value of each transaction.
+										$query = "SELECT public.Transactions.guid, public.Transactions.post_date, public.Transactions.description, public.Splits.value_num, public.Splits.value_denom
+										FROM public.Transactions
+										INNER JOIN public.Splits ON public.Transactions.guid=public.Splits.tx_guid
+										ORDER BY public.transactions.post_date DESC";
+										$res_trans = pg_query($dbconn, $query);
+										echo("<tbody>");
+										
+										#Grab an array of rows of transactions, then create a table entry for each row
+										while ($row = pg_fetch_row($res_trans)) {
 											
-											#Select the Transaction GUID, PostDate, Description, and Value of each transaction.
-											$query = "SELECT public.Transactions.guid, public.Transactions.post_date, public.Transactions.description, public.Splits.value_num, public.Splits.value_denom
-											FROM public.Transactions
-											INNER JOIN public.Splits ON public.Transactions.guid=public.Splits.tx_guid
-											ORDER BY public.transactions.post_date DESC";
-											$res_trans = pg_query($dbconn, $query);
-											echo("<tbody>");
-											
-											#Grab an array of rows of transactions, then create a table entry for each row
-											while ($row = pg_fetch_row($res_trans)) {
-												
-												#Start new table row (aka new transaction)
-												#Enter row details, for value only show the positive values for each account (splits is balanced with positive + negative transactions)
-												echo("<tr>");
-												$date = date('Y-m-d', strtotime($row[1]));	
-												$value = $row[3]/$row[4];
-												if ((int)$value > 0){
-													echo("<td>$date</td>");
-													echo("<td>$row[2]</td>");
-													echo("<td>$$value</td>");
-												}
-												#End of row
-												echo("</tr>\n");
+											#Start new table row (aka new transaction)
+											#Enter row details, for value only show the positive values for each account (splits is balanced with positive + negative transactions)
+											echo("<tr>");
+											$date = date('Y-m-d', strtotime($row[1]));	
+											$value = $row[3]/$row[4];
+											if ((int)$value > 0){
+												echo("<td class='col-xs-3'>$date</td>");
+												echo("<td class='col-xs-7'>$row[2]</td>");
+												echo("<td class='col-xs-2'>$$value</td>");
 											}
-											echo("</tbody>");
-											echo("</table>");
-										?>
-                                    </table>
-                                </div>
-                                <div class="text-right">
-                                    <a href="#">View All Transactions <i class="fa fa-arrow-circle-right"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+											#End of row
+											echo("</tr>\n");
+										}
+										echo("</tbody>");
+										echo("</table>");
+									?>
+								</table>
+							</div>
+							<div class="text-right">
+								<a href="#">View All Transactions <i class="fa fa-arrow-circle-right"></i></a>
+							</div>
+						</div>
+					</div>
+                </div>
 				
                 <!-- /.row -->
 
@@ -348,7 +386,6 @@
 	<?php
 	$bargraph_inner_array = array();
 	$bargraph_array = array();
-	$emptyParentGUID = "74a4f183da91fccda3bcef482a5cc821";
 	
 	#Iterate through the list of Expense Accounts 
 	$query = "SELECT
@@ -365,15 +402,13 @@
 	while ($account = pg_fetch_row($res_accounts_list)) {
 
 		#Find the total value of each account and add to array.
-		if($account[2] != $emptyParentGUID) {
-			$total_value = (intval($account[3])/100);
-			
-			$bargraph_inner_array[account]=$account[1];
-			$bargraph_inner_array[value]=$total_value;
-			
-			#Add the array with the current account name + value to the main bargraph array.
-			$bargraph_array[] = $bargraph_inner_array;
-		}
+		$total_value = (intval($account[3])/100);
+		
+		$bargraph_inner_array[account]=$account[1];
+		$bargraph_inner_array[value]=$total_value;
+		
+		#Add the array with the current account name + value to the main bargraph array.
+		$bargraph_array[] = $bargraph_inner_array;
 	}
 	#Sort the Bar Graph Array in descending account value
 	usort($bargraph_array, function($b, $a) {
