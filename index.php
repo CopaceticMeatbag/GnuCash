@@ -32,7 +32,7 @@
 	
 	<!--Declare our PHP Database Connection-->
 	<?php
-	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=postPASS101";
+	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=password";
 	$dbconn = pg_connect($conn_string);
 	?>
 	
