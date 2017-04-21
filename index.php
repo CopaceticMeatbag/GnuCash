@@ -19,6 +19,9 @@
 
     <!-- Morris Charts CSS -->
     <link href="css/plugins/morris.css" rel="stylesheet">
+	
+	<!-- JTable Tables CSS -->
+	<link href="js/plugins/jtable/themes/lightcolor/blue/jtable.css" rel="stylesheet" type="text/css" />
 
     <!-- Custom Fonts -->
     <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -375,6 +378,9 @@
     <script src="js/plugins/morris/raphael.min.js"></script>
     <script src="js/plugins/morris/morris.min.js"></script>
     <script src="js/plugins/morris/morris-data.js"></script>
+	
+	<!-- JTable Tables JavaScript -->
+	<script src="js/plugins/jtable/jquery.jtable.js"></script>
 	
 	<!-- ChartJS Charts JavaScript -->
     <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>-->
