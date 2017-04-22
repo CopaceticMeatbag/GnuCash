@@ -10,36 +10,42 @@
     <meta name="author" content="Mike A">
 
     <title>GnuCash Accounting</title>
-
-    <!-- Bootstrap Core CSS -->
+	
+	<!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
     <link href="css/sb-admin.css" rel="stylesheet">
-
-    <!-- Morris Charts CSS -->
+	
+	<!-- Morris Charts CSS -->
     <link href="css/plugins/morris.css" rel="stylesheet">
 	
 	<!-- JTable Tables CSS -->
 	<link href="js/plugins/jtable/themes/lightcolor/blue/jtable.css" rel="stylesheet" type="text/css" />
+	
+	<!-- jQuery -->
+    <script src="js/jquery.js"></script>
+	<script src="js/jquery-ui.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+	
+	<!-- JTable Tables JavaScript -->
+	<script src="js/plugins/jtable/jquery.jtable.min.js"></script>
+	
+    <!-- Morris Charts JavaScript -->
+    <script src="js/plugins/morris/raphael.min.js"></script>
+    <script src="js/plugins/morris/morris.min.js"></script>
+	
+	<!-- ChartJS Charts JavaScript -->
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>-->
 
     <!-- Custom Fonts -->
     <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
 	
-	<!--Declare our PHP Database Connection-->
-	<?php
-	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=postPASS101";
-	$dbconn = pg_connect($conn_string);
-	?>
+	<!-- Load PHP Sources -->
+	<?php require_once('data/ExpenseData.php');?>
 	
-
 </head>
 
 <body>
@@ -212,25 +218,8 @@
 								</div>
 								<div class="panel-body money-saved">
 								<?php
-									$query = "Select SUM(Total) from (Select 
-												  Sum(splits.value_num) as Total, 
-												  accounts.account_type 
-												From 
-												  splits Inner Join 
-												  accounts On accounts.guid = splits.account_guid Inner Join 
-												  transactions On splits.tx_guid = transactions.guid 
-												Where 
-												  transactions.post_date >= date_trunc('month', CURRENT_DATE) 
-												Group By 
-												  accounts.account_type 
-												Having 
-												  accounts.account_type Not In ('EXPENSE', 'INCOME') 
-												Order By 
-												  accounts.account_type ) as TotalSaved";
-									$res_account_value_month = pg_query($dbconn,$query);
-									$MonthlyGainz = pg_fetch_row($res_account_value_month);
-									$MonthlyGainz = (intval($MonthlyGainz[0])/100);
-									echo("<p>$$MonthlyGainz</p>");
+									$Gainz = money_saved('month');
+									echo("<p>$$Gainz</p>");
 								?>
 								</div>
 							</div>
@@ -242,25 +231,8 @@
 								</div>
 								<div class="panel-body money-saved">
 								<?php
-									$query = "Select SUM(Total) from (Select 
-												  Sum(splits.value_num) as Total, 
-												  accounts.account_type 
-												From 
-												  splits Inner Join 
-												  accounts On accounts.guid = splits.account_guid Inner Join 
-												  transactions On splits.tx_guid = transactions.guid 
-												Where 
-												  transactions.post_date >= date_trunc('year', CURRENT_DATE) 
-												Group By 
-												  accounts.account_type 
-												Having 
-												  accounts.account_type Not In ('EXPENSE', 'INCOME') 
-												Order By 
-												  accounts.account_type ) as TotalSaved";
-									$res_account_value_year = pg_query($dbconn,$query);
-									$YearlyGainz = pg_fetch_row($res_account_value_year);
-									$YearlyGainz = (intval($YearlyGainz[0])/100);
-									echo("<p>$$YearlyGainz</p>");
+									$Gainz = money_saved('year');
+									echo("<p>$$Gainz</p>");
 								?>
 								</div>
 							</div>
@@ -272,23 +244,8 @@
 								</div>
 								<div class="panel-body money-saved">
 								<?php
-									$query = "Select SUM(Total) from (Select 
-												  Sum(splits.value_num) as Total, 
-												  accounts.account_type 
-												From 
-												  splits Inner Join 
-												  accounts On accounts.guid = splits.account_guid Inner Join 
-												  transactions On splits.tx_guid = transactions.guid  
-												Group By 
-												  accounts.account_type 
-												Having 
-												  accounts.account_type Not In ('EXPENSE', 'INCOME') 
-												Order By 
-												  accounts.account_type ) as TotalSaved";
-									$res_account_value_total = pg_query($dbconn,$query);
-									$TotalGainz = pg_fetch_row($res_account_value_total);
-									$TotalGainz = (intval($TotalGainz[0])/100);
-									echo("<p>$$TotalGainz</p>");
+									$Gainz = money_saved('total');
+									echo("<p>$$Gainz</p>");
 								?>
 								</div>
 							</div>
@@ -314,41 +271,54 @@
 							<h3 class="panel-title"><i class="fa fa-money fa-fw"></i><b> Transactions Panel </b></h3>
 						</div>
 						<div class="panel-body">
-							<div class="table-responsive">
-								<table class="table table-bordered table-hover table-striped">
-									<?php
-										echo("<thead>");
-										echo("<tr>
-										<th>Date</th><th>Description</th><th>Amount</th></tr>");
-										echo("</thead>");
-										
-										#Select the Transaction GUID, PostDate, Description, and Value of each transaction.
-										$query = "SELECT public.Transactions.guid, public.Transactions.post_date, public.Transactions.description, public.Splits.value_num, public.Splits.value_denom
-										FROM public.Transactions
-										INNER JOIN public.Splits ON public.Transactions.guid=public.Splits.tx_guid
-										ORDER BY public.transactions.post_date DESC";
-										$res_trans = pg_query($dbconn, $query);
-										echo("<tbody>");
-										
-										#Grab an array of rows of transactions, then create a table entry for each row
-										while ($row = pg_fetch_row($res_trans)) {
-											
-											#Start new table row (aka new transaction)
-											#Enter row details, for value only show the positive values for each account (splits is balanced with positive + negative transactions)
-											echo("<tr>");
-											$date = date('Y-m-d', strtotime($row[1]));	
-											$value = $row[3]/$row[4];
-											if ((int)$value > 0){
-												echo("<td>$date</td>");
-												echo("<td>$row[2]</td>");
-												echo("<td>$$value</td>");
+							<div id="TransactionsTableContainer">
+							<script type="text/javascript">
+								$(document).ready(function () {
+
+									//Prepare jTable
+									$('#TransactionsTableContainer').jtable({
+										title: 'Table of Transactions',
+										actions: {
+											listAction: 'data/TableData.php?action=list',
+											createAction: 'data/TableData.php?action=create',
+											updateAction: 'data/TableData.php?action=update',
+											deleteAction: 'data/TableData.php?action=delete'
+										},
+										fields: {
+											guid: {
+												key: true,
+												create: false,
+												edit: false,
+												list: false
+											},
+											post_date: {
+												title: 'Date',
+												type: 'date',
+												width: '20%',
+												edit: false,
+											},
+											description: {
+												title: 'Description',
+												width: '40%',
+												edit: false
+											},
+											value_num: {
+												title: 'Value',
+												width: '30%',
+												create: false,
+												edit: false
+											},
+											value_denom: {
+												list: false,
+												create: false,
+												edit: false
 											}
-											#End of row
-											echo("</tr>\n");
 										}
-										echo("</tbody>");
-									?>
-								</table>
+									});
+									
+									$('#TransactionsTableContainer').jtable('load');
+								});
+							</script>
 							</div>
 							<div class="text-right">
 								<a href="#">View All Transactions <i class="fa fa-arrow-circle-right"></i></a>
@@ -367,76 +337,20 @@
 
     </div>
     <!-- /#wrapper -->
-
-    <!-- jQuery -->
-    <script src="js/jquery.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="js/bootstrap.min.js"></script>
-	
-    <!-- Morris Charts JavaScript -->
-    <script src="js/plugins/morris/raphael.min.js"></script>
-    <script src="js/plugins/morris/morris.min.js"></script>
-    <script src="js/plugins/morris/morris-data.js"></script>
-	
-	<!-- JTable Tables JavaScript -->
-	<script src="js/plugins/jtable/jquery.jtable.js"></script>
-	
-	<!-- ChartJS Charts JavaScript -->
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>-->
-	
 	<script>
-	<!-- Generate data from PostgreSQL, ready for JSON accepting Charts/Graphs -->
-	<!-- Generate Bargraph Array -->
-	<?php
-	$bargraph_inner_array = array();
-	$bargraph_array = array();
-	
-	#Iterate through the list of Expense Accounts 
-	$query = "SELECT
-	public.Accounts.guid,
-	public.Accounts.name,
-	public.Accounts.parent_guid,
-	SUM(public.Splits.value_num) AS total
-	FROM public.Accounts
-	INNER JOIN public.Splits 
-		ON public.Accounts.guid=public.Splits.account_guid
-    WHERE public.Accounts.account_type = 'EXPENSE'
-	GROUP BY public.accounts.guid,public.accounts.name,public.accounts.parent_guid";
-	$res_accounts_list = pg_query($dbconn, $query);
-	while ($account = pg_fetch_row($res_accounts_list)) {
-
-		#Find the total value of each account and add to array.
-		$total_value = (intval($account[3])/100);
-		
-		$bargraph_inner_array[account]=$account[1];
-		$bargraph_inner_array[value]=$total_value;
-		
-		#Add the array with the current account name + value to the main bargraph array.
-		$bargraph_array[] = $bargraph_inner_array;
-	}
-	#Sort the Bar Graph Array in descending account value
-	usort($bargraph_array, function($b, $a) {
-		return $a['value'] - $b['value'];
-	});
-	?>
-	<!-- End Generate Bargraph Array -->
-	
 	<!-- Custom Morris Charts JavaScript -->
 	Morris.Bar({
-  element: 'expense-bar',
-  data: <?php echo json_encode($bargraph_array);?>,
-  xkey: ['account'],
-  ykeys: ['value'],
-  labels: ['Account Value'],
-  resize: true,
-  gridTextSize: 12,
-  gridTextWeight: 'bold',
-  xLabelMargin: 7
-});
-
+	  element: 'expense-bar',
+	  data: <?php echo json_encode(graph_data());?>,
+	  xkey: ['account'],
+	  ykeys: ['value'],
+	  labels: ['Account Value'],
+	  resize: true,
+	  gridTextSize: 12,
+	  gridTextWeight: 'bold',
+	  xLabelMargin: 7
+	});
 	</script>
 
 </body>
-
 </html>
