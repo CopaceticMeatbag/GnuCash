@@ -3,7 +3,7 @@
 try
 {
 	//Open database connection
-	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=postPASS101";
+	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=password";
 	$dbconn = pg_connect($conn_string);
 	
 	//Getting records (listAction)

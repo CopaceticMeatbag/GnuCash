@@ -3,7 +3,7 @@
 function money_saved($period){
 	
 		//Open database connection
-		$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=postPASS101";
+		$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=password";
 		$dbconn = pg_connect($conn_string);
 		
 		//Define period to return
@@ -38,7 +38,7 @@ function money_saved($period){
 function graph_data(){
 	
 	//Open database connection
-	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=postPASS101";
+	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=password";
 	$dbconn = pg_connect($conn_string);
 		
 	$bargraph_inner_array = array();
@@ -61,8 +61,8 @@ function graph_data(){
 		#Find the total value of each account and add to array.
 		$total_value = (intval($account[3])/100);
 		
-		$bargraph_inner_array[account]=$account[1];
-		$bargraph_inner_array[value]=$total_value;
+		$bargraph_inner_array['account']=$account[1];
+		$bargraph_inner_array['value']=$total_value;
 		
 		#Add the array with the current account name + value to the main bargraph array.
 		$bargraph_array[] = $bargraph_inner_array;
