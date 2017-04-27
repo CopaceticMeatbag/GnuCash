@@ -1,6 +1,6 @@
 # Pretty GnuCash
 
-[GnuCash] (http://www.gnucash.org/) is an open source double-entry accounting system, which just happens to be ugly as hell.
+[GnuCash](http://www.gnucash.org/) is an open source double-entry accounting system, which just happens to be ugly as hell.
 This is a project designed to change that.
 
 ## Getting Started
@@ -10,6 +10,7 @@ To use this website:
 * Install PHP & PostgreSQL
 * Setup your favourite web server (Apache, IIS, etc)
 * Clone the repo into the web server's default directory: `git clone https://github.com/CopaceticMeatbag/GnuCash.git`
+* Save your GnuCash data in PostgreSQL
 
 ## Bugs and Issues
 
@@ -18,7 +19,7 @@ In the interim, please feel free to offer feedback or make any suggestions you w
 
 ## Creator
 
-*[Mike Anthony] (https://github.com/CopaceticMeatbag)
+*[Mike Anthony](https://github.com/CopaceticMeatbag)
 
 ## Copyright and License
 
