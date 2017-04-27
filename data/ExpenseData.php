@@ -40,43 +40,31 @@ function graph_data(){
 	//Open database connection
 	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=password";
 	$dbconn = pg_connect($conn_string);
-		
-	$bargraph_inner_array = array();
-	$bargraph_array = array();
 	
 	#Iterate through the list of Expense Accounts 
 	$query = "SELECT
-				public.Accounts.guid,
-				public.Accounts.name,
-				public.Accounts.parent_guid,
-				SUM(public.Splits.value_num) AS total
+				public.Accounts.name AS account,
+				SUM(public.Splits.value_num) AS value
 			FROM public.Accounts
 			INNER JOIN public.Splits 
 				ON public.Accounts.guid=public.Splits.account_guid
 			INNER JOIN public.transactions
 				ON splits.tx_guid = transactions.guid
 			WHERE public.Accounts.account_type = 'EXPENSE' AND public.transactions.post_date >= date_trunc('month', CURRENT_DATE)
-			GROUP BY public.accounts.guid,public.accounts.name,public.accounts.parent_guid";
+			GROUP BY public.accounts.name
+			ORDER BY value DESC";
 	$result = pg_query($dbconn, $query);
-	while ($account = pg_fetch_row($result)) {
-
-		#Find the total value of each account and add to array.
-		$total_value = (intval($account[3])/100);
-		
-		$bargraph_inner_array['account']=$account[1];
-		$bargraph_inner_array['value']=$total_value;
-		
-		#Add the array with the current account name + value to the main bargraph array.
-		$bargraph_array[] = $bargraph_inner_array;
-	}
-	#Sort the Bar Graph Array in descending account value
-	usort($bargraph_array, function($b, $a) {
-		return $a['value'] - $b['value'];
-	});
 	
+	$rows = array();
+	while($row = pg_fetch_array($result,NULL,PGSQL_ASSOC))
+	{
+		$row['value'] = (intval($row['value'])/100);
+		$rows[] = $row;
+	}
+
 	//Close database connection
 	pg_close($dbconn);
 	
-	return $bargraph_array;
+	return $rows;
 }
 ?>
