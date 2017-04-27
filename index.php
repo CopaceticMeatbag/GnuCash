@@ -299,12 +299,12 @@
 											},
 											description: {
 												title: 'Description',
-												width: '40%',
+												width: '30%',
 												edit: false
 											},
 											value_num: {
 												title: 'Value',
-												width: '30%',
+												width: '20%',
 												create: false,
 												edit: false
 											},

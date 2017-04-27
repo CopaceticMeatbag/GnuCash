@@ -46,15 +46,17 @@ function graph_data(){
 	
 	#Iterate through the list of Expense Accounts 
 	$query = "SELECT
-	public.Accounts.guid,
-	public.Accounts.name,
-	public.Accounts.parent_guid,
-	SUM(public.Splits.value_num) AS total
-	FROM public.Accounts
-	INNER JOIN public.Splits 
-		ON public.Accounts.guid=public.Splits.account_guid
-    WHERE public.Accounts.account_type = 'EXPENSE'
-	GROUP BY public.accounts.guid,public.accounts.name,public.accounts.parent_guid";
+				public.Accounts.guid,
+				public.Accounts.name,
+				public.Accounts.parent_guid,
+				SUM(public.Splits.value_num) AS total
+			FROM public.Accounts
+			INNER JOIN public.Splits 
+				ON public.Accounts.guid=public.Splits.account_guid
+			INNER JOIN public.transactions
+				ON splits.tx_guid = transactions.guid
+			WHERE public.Accounts.account_type = 'EXPENSE' AND public.transactions.post_date >= date_trunc('month', CURRENT_DATE)
+			GROUP BY public.accounts.guid,public.accounts.name,public.accounts.parent_guid";
 	$result = pg_query($dbconn, $query);
 	while ($account = pg_fetch_row($result)) {
 

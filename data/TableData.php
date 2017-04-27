@@ -6,24 +6,29 @@ try
 	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=password";
 	$dbconn = pg_connect($conn_string);
 	
+	if(isset($_GET['action'])){
+    $action = $_GET['action'];
+}
+	
 	//Getting records (listAction)
-	if($_GET["action"] == "list")
+	if(isset($action) == "list")
 	{
 		//Get records from database
-		$query = "SELECT public.Transactions.guid, public.Transactions.post_date, public.Transactions.description, public.Splits.value_num, public.Splits.value_denom
-						FROM public.Transactions INNER JOIN
-							public.Splits ON public.Transactions.guid=public.Splits.tx_guid
-						ORDER BY post_date DESC";
+		$query = "SELECT public.Transactions.guid, public.Transactions.post_date, public.Transactions.description, public.Splits.value_num, public.Splits.value_denom from public.splits
+					Inner Join accounts On accounts.guid = splits.account_guid
+					Inner Join transactions On splits.tx_guid = transactions.guid
+					WHERE accounts.account_type In ('EXPENSE')
+					ORDER BY post_date DESC";
 		$result = pg_query($dbconn, $query);
 		
 		//Add all records to an array
 		$rows = array();
-		while($row = pg_fetch_array($result))
+		while($row = pg_fetch_array($result,NULL,PGSQL_ASSOC))
 		{
-			$row[3] = $row[3]/100;
+			$row['value_num'] = "$".(intval($row['value_num'])/intval($row['value_denom']));
 		    $rows[] = $row;
 		}
-
+		
 		//Return result to jTable
 		$jTableResult = array();
 		$jTableResult['Result'] = "OK";
@@ -31,7 +36,7 @@ try
 		print json_encode($jTableResult);
 	}
 	//Creating a new record (createAction)
-	else if($_GET["action"] == "create")
+	else if(isset($action) == "create")
 	{
 		//Insert record into database
 		$result = mysql_query("INSERT INTO people(Name, Age, RecordDate) VALUES('" . $_POST["Name"] . "', " . $_POST["Age"] . ",now());");
@@ -47,7 +52,7 @@ try
 		print json_encode($jTableResult);
 	}
 	//Updating a record (updateAction)
-	else if($_GET["action"] == "update")
+	else if(isset($action) == "update")
 	{
 		//Update record in database
 		$result = mysql_query("UPDATE people SET Name = '" . $_POST["Name"] . "', Age = " . $_POST["Age"] . " WHERE PersonId = " . $_POST["PersonId"] . ";");
@@ -58,7 +63,7 @@ try
 		print json_encode($jTableResult);
 	}
 	//Deleting a record (deleteAction)
-	else if($_GET["action"] == "delete")
+	else if(isset($action) == "delete")
 	{
 		//Delete from database
 		$result = mysql_query("DELETE FROM people WHERE PersonId = " . $_POST["PersonId"] . ";");
