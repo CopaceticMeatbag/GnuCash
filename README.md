@@ -1,27 +1,26 @@
-# [Start Bootstrap](http://startbootstrap.com/) - [SB Admin](http://startbootstrap.com/template-overviews/sb-admin/)
+# Pretty GnuCash
 
-[SB Admin](http://startbootstrap.com/template-overviews/sb-admin/) is an open source, admin dashboard template for [Bootstrap](http://getbootstrap.com/) created by [Start Bootstrap](http://startbootstrap.com/).
+[GnuCash] (http://www.gnucash.org/) is an open source double-entry accounting system, which just happens to be ugly as hell.
+This is a project designed to change that.
 
 ## Getting Started
 
-To begin using this template, choose one of the following options to get started:
-* [Download the latest release on Start Bootstrap](http://startbootstrap.com/template-overviews/sb-admin/)
-* Clone the repo: `git clone https://github.com/BlackrockDigital/startbootstrap-sb-admin.git`
-* Fork the repo
+To use this website:
+
+* Install PHP & PostgreSQL
+* Setup your favourite web server (Apache, IIS, etc)
+* Clone the repo into the web server's default directory: `git clone https://github.com/CopaceticMeatbag/GnuCash.git`
 
 ## Bugs and Issues
 
-Have a bug or an issue with this template? [Open a new issue](https://github.com/BlackrockDigital/startbootstrap-sb-admin/issues) here on GitHub or leave a comment on the [template overview page at Start Bootstrap](http://startbootstrap.com/template-overviews/sb-admin/).
+There are currently quite a few bugs and missing features, these will be fixed and added over the next few weeks.
+In the interim, please feel free to offer feedback or make any suggestions you wish!
 
 ## Creator
 
-Start Bootstrap was created by and is maintained by **[David Miller](http://davidmiller.io/)**, Owner of [Blackrock Digital](http://blackrockdigital.io/).
-
-* https://twitter.com/davidmillerskt
-* https://github.com/davidtmiller
-
-Start Bootstrap is based on the [Bootstrap](http://getbootstrap.com/) framework created by [Mark Otto](https://twitter.com/mdo) and [Jacob Thorton](https://twitter.com/fat).
+*[Mike Anthony] (https://github.com/CopaceticMeatbag)
 
 ## Copyright and License
 
-Copyright 2013-2016 Blackrock Digital LLC. Code released under the [MIT](https://github.com/BlackrockDigital/startbootstrap-sb-admin/blob/gh-pages/LICENSE) license.
+This project makes heavy use of "Start Bootstrap" by **[David Miller](http://davidmiller.io/)**
+All other code may be copied/used as you wish with respect to any licences parts of the project may be under.
