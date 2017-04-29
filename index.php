@@ -343,14 +343,20 @@
 	  element: 'expense-bar',
 	  data: <?php echo json_encode(graph_data());?>,
 	  xkey: ['account'],
-	  ykeys: ['value'],
-	  labels: ['Account Value'],
+	  ykeys: ['value','budget','placeholder'],
+	  labels: ['Account Value','Budget Remaining','Total Budget'],
 	  resize: true,
 	  gridTextSize: 12,
 	  gridTextWeight: 'bold',
-	  xLabelMargin: 7
+	  xLabelMargin: 7,
+	  preUnits: "$",
+	  stacked: true,
+	  hoverCallback: function (index, options, content, row) {
+		var txtToReplace = $(content)[3].textContent;
+		var text =  '<div>Total Budget: $' + options.data[index].total_budget + '</div>';
+		return content.replace(txtToReplace, text);
+  }
 	});
 	</script>
-
 </body>
 </html>
