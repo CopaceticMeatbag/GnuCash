@@ -352,10 +352,34 @@
 	  preUnits: "$",
 	  stacked: true,
 	  hoverCallback: function (index, options, content, row) {
+		var colour = "#7a92a3";
+		//if ((options.data[index].total_budget - options.data[index].value) < 0 && options.data[index].total_budget != 0){
+		if (options.data[index].budget < 0){
+			var colour = "#770000"; //red if over budget
+		}else{
+			var colour = "#006600"; //green if not over budget
+		}
+		var txtToReplace = $(content)[2].textContent;
+		var text = "<div class='morris-hover-point' style='color: #7a92a3'>Total Budget: $"+ options.data[index].total_budget + "</div>";
+		content = content.replace(txtToReplace, text);
 		var txtToReplace = $(content)[3].textContent;
-		var text =  '<div>Total Budget: $' + options.data[index].total_budget + '</div>';
-		return content.replace(txtToReplace, text);
-  }
+		var text = "<div class='morris-hover-point' style='color: "+colour+"'>Budget Remaining: $"+ options.data[index].budget + "</div>";
+		content = content.replace(txtToReplace, text);
+		return (content);
+	  },
+	  barColors: function(row, series, type) {
+		if(series.key == 'budget')
+		  {
+			if(row.y < 0)
+			  return "#770000"; //over budget
+			else
+			  return "#7a92a3";  //under budget
+		  }
+		  else
+		  {
+			return "#0b62a4"; //standard colour
+		  }
+	  }
 	});
 	</script>
 </body>

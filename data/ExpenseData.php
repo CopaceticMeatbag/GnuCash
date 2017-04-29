@@ -57,16 +57,22 @@ LEFT JOIN
 	WHERE public.accounts.account_type = 'EXPENSE' AND public.budget_amounts.period_num = date_part('month', CURRENT_DATE)) t2
 ON
 	t1.account = t2.account
+WHERE t1.account != 'Misc'
 ORDER BY value DESC";
 	$result = pg_query($dbconn, $query);
 	
 	$rows = array();
 	while($row = pg_fetch_array($result,NULL,PGSQL_ASSOC))
 	{
-		$row['budget'] = intval($row['total_budget']) - intval($row['value']);
-		if ($row['budget'] < 0){
-			$row['budget']=0;
+		if ($row['total_budget'] != 0){
+			$row['budget'] = number_format((float)($row['total_budget'] - $row['value']), 2, '.', '');
+		}else {
+			$row['budget'] = 0;
 		}
+		
+		#if ($row['budget'] < 0){
+		#	$row['budget']=0;
+		#}
 		$rows[] = $row;
 	}
 	//Close database connection
