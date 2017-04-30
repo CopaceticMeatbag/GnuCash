@@ -69,10 +69,6 @@ ORDER BY value DESC";
 		}else {
 			$row['budget'] = 0;
 		}
-		
-		#if ($row['budget'] < 0){
-		#	$row['budget']=0;
-		#}
 		$rows[] = $row;
 	}
 	//Close database connection

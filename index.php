@@ -20,8 +20,8 @@
 	<!-- Morris Charts CSS -->
     <link href="css/plugins/morris.css" rel="stylesheet">
 	
-	<!-- JTable Tables CSS -->
-	<link href="js/plugins/jtable/themes/lightcolor/blue/jtable.css" rel="stylesheet" type="text/css" />
+	<!-- DynaTable CSS -->
+	<link href="css/plugins/jquery.dynatable.css" rel="stylesheet" type="text/css" />
 	
 	<!-- jQuery -->
     <script src="js/jquery.js"></script>
@@ -30,8 +30,8 @@
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
 	
-	<!-- JTable Tables JavaScript -->
-	<script src="js/plugins/jtable/jquery.jtable.min.js"></script>
+	<!-- DynaTable JavaScript -->
+	<script src="js/plugins/dynatable/jquery.dynatable.js"></script>
 	
     <!-- Morris Charts JavaScript -->
     <script src="js/plugins/morris/raphael.min.js"></script>
@@ -44,7 +44,10 @@
     <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 	
 	<!-- Load PHP Sources -->
-	<?php require_once('data/ExpenseData.php');?>
+	<?php
+	require_once('data/ExpenseData.php');
+	require_once('data/TableData.php');
+	?>
 	
 </head>
 
@@ -197,9 +200,8 @@
         </nav>
 
         <div id="page-wrapper">
-
             <div class="container-fluid">
-
+			
                 <!-- Page Heading -->
                 <div class="row">
                     <div class="col-lg-12">
@@ -271,62 +273,40 @@
 							<h3 class="panel-title"><i class="fa fa-money fa-fw"></i><b> Transactions Panel </b></h3>
 						</div>
 						<div class="panel-body">
-							<div id="TransactionsTableContainer">
+							<div class="row">
+								<div class="bodycontainer">
+								<table id="TransactionsTable" class="table table-bordered table-striped">
+									<thead>
+										<tr>
+											<th bgcolor="#0b62a4">Date</th>
+											<th bgcolor="#0b62a4">Description</th>
+											<th bgcolor="#0b62a4">Value</th>
+										</tr>
+									</thead>
+									<tbody>
+									</tbody>
+								</table>
+								</div>
+							</div>
 							<script type="text/javascript">
 								$(document).ready(function () {
-
-									//Prepare jTable
-									$('#TransactionsTableContainer').jtable({
-										title: 'Table of Transactions',
-										actions: {
-											listAction: 'data/TableData.php?action=list',
-											createAction: 'data/TableData.php?action=create',
-											updateAction: 'data/TableData.php?action=update',
-											deleteAction: 'data/TableData.php?action=delete'
-										},
-										fields: {
-											guid: {
-												key: true,
-												create: false,
-												edit: false,
-												list: false
-											},
-											post_date: {
-												title: 'Date',
-												type: 'date',
-												width: '20%',
-												edit: false,
-											},
-											description: {
-												title: 'Description',
-												width: '30%',
-												edit: false
-											},
-											value_num: {
-												title: 'Value',
-												width: '20%',
-												create: false,
-												edit: false
-											},
-											value_denom: {
-												list: false,
-												create: false,
-												edit: false
-											}
+									//Prepare DynaTable
+									var $records = <?php echo TableData();?>;
+									$('#TransactionsTable').dynatable({
+										dataset: {
+											records: $records.Records
 										}
 									});
-									
-									$('#TransactionsTableContainer').jtable('load');
 								});
 							</script>
-							</div>
+							<div class="row">
 							<div class="text-right">
 								<a href="#">View All Transactions <i class="fa fa-arrow-circle-right"></i></a>
+							</div>
 							</div>
 						</div>
 					</div>
                 </div>
-				
                 <!-- /.row -->
 
             </div>
