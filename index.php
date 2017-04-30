@@ -353,7 +353,6 @@
 	  stacked: true,
 	  hoverCallback: function (index, options, content, row) {
 		var colour = "#7a92a3";
-		//if ((options.data[index].total_budget - options.data[index].value) < 0 && options.data[index].total_budget != 0){
 		if (options.data[index].budget < 0){
 			var colour = "#770000"; //red if over budget
 		}else{
@@ -363,7 +362,12 @@
 		var text = "<div class='morris-hover-point' style='color: #7a92a3'>Total Budget: $"+ options.data[index].total_budget + "</div>";
 		content = content.replace(txtToReplace, text);
 		var txtToReplace = $(content)[3].textContent;
-		var text = "<div class='morris-hover-point' style='color: "+colour+"'>Budget Remaining: $"+ options.data[index].budget + "</div>";
+		if (options.data[index].budget < 0){
+			var budget="Over Budget By: -$"+-1*options.data[index].budget
+		}else{
+			var budget="Budget Remaining: $"+options.data[index].budget
+		};
+		var text = "<div class='morris-hover-point' style='color: "+colour+"'>" + budget + "</div>";
 		content = content.replace(txtToReplace, text);
 		return (content);
 	  },
