@@ -231,3 +231,19 @@ ul.alert-dropdown {
 	text-align:center;
 	height: 54px;
 }
+table {
+    width: 511px; /* 140px * 3 column + 16px scrollbar width */
+    border-spacing: 0;
+}
+
+tbody, thead tr { display: block; }
+
+tbody {
+    height: 325px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+tbody td, thead th {
+    width: 165px;
+}
