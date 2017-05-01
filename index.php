@@ -223,7 +223,7 @@
 	<!-- Custom Morris Charts JavaScript -->
 	Morris.Bar({
 	  element: 'expense-bar',
-	  data: <?php echo json_encode(graph_data());?>,
+	  data: <?php echo graph_data();?>,
 	  xkey: ['account'],
 	  ykeys: ['value','budget','placeholder'],
 	  labels: ['Account Value','Budget Remaining','Total Budget'],
