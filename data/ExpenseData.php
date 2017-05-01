@@ -42,7 +42,7 @@ function graph_data(){
 	$dbconn = pg_connect($conn_string);
 	
 	#Iterate through the list of Expense Accounts 
-	$query = "SELECT concat(t1.account,t2.account) AS account, COALESCE(t1.budget,t2.value,0) AS total_budget, COALESCE(t2.value,0) AS value
+	$query = "SELECT COALESCE(t1.account,t2.account) AS account, COALESCE(t1.budget,t2.value,0) AS total_budget, COALESCE(t2.value,0) AS value
 FROM
 	(SELECT public.accounts.name AS account, round(public.budget_amounts.amount_num::decimal/public.budget_amounts.amount_denom::decimal,2) AS budget
 	FROM public.budget_amounts 
