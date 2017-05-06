@@ -20,18 +20,22 @@
 	<!-- Morris Charts CSS -->
     <link href="css/plugins/morris.css" rel="stylesheet">
 	
-	<!-- DynaTable CSS -->
-	<link href="css/plugins/jquery.dynatable.css" rel="stylesheet" type="text/css" />
+	<!-- JTable CSS -->
+	<link href="js/plugins/jtable/themes/lightcolor/gray/jtable.css" rel="stylesheet" type="text/css" />
+	
+	<!-- jQuery ui CSS -->
+	<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.0/themes/base/jquery-ui.css" type="text/css" rel="stylesheet" />
+
 	
 	<!-- jQuery -->
     <script src="js/jquery.js"></script>
-	<script src="js/jquery-ui.min.js"></script>
-
+	<script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+	
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
 	
-	<!-- DynaTable JavaScript -->
-	<script src="js/plugins/dynatable/jquery.dynatable.js"></script>
+	<!-- JTable JavaScript -->
+	<script src="js/plugins/jtable/jquery.jtable.js"></script>
 	
     <!-- Morris Charts JavaScript -->
     <script src="js/plugins/morris/raphael.min.js"></script>
@@ -69,7 +73,7 @@
             <!-- Top Menu Items -->
             <ul class="nav navbar-right top-nav">
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> S0ULphIRE <b class="caret"></b></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> Copacetic Meatbag <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li>
                             <a href="#"><i class="fa fa-fw fa-user"></i> Profile</a>
@@ -94,7 +98,7 @@
                         <a href="index.php"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
                     </li>
                     <li>
-                        <a href="pages/blank-page.html"><i class="fa fa-fw fa-file"></i> Blank Page</a>
+                        <a href="pages/blank-page.html"><i class="fa fa-fw fa-file"></i> View Transactions</a>
                     </li>
                 </ul>
             </div>
@@ -175,31 +179,65 @@
 							<h3 class="panel-title"><i class="fa fa-money fa-fw"></i><b> Transactions Panel </b></h3>
 						</div>
 						<div class="panel-body">
-							<div class="row">
-								<div class="bodycontainer">
-								<table id="TransactionsTable" class="table table-bordered table-striped">
-									<thead>
-										<tr>
-											<th bgcolor="#0b62a4">Date</th>
-											<th bgcolor="#0b62a4">Description</th>
-											<th bgcolor="#0b62a4">Value</th>
-										</tr>
-									</thead>
-									<tbody>
-									</tbody>
-								</table>
+							<div class="row"><!-- style="max-height:460px;overflow:auto;">-->
+								<div id="TransactionsTable" class="TransactionsTable">
 								</div>
 							</div>
 							<script type="text/javascript">
+							
 								$(document).ready(function () {
-									//Prepare DynaTable
-									var $records = <?php echo TableData();?>;
-									$('#TransactionsTable').dynatable({
-										dataset: {
-											records: $records.Records
+									
+									//Prepare jTable
+									$('#TransactionsTable').jtable({
+										title: 'Transactions',
+										defaultDateFormat: 'dd-mm-yy',
+										defaultSorting: 'date DESC',
+										paging: 'false',
+										actions: {
+											listAction: 'data/TableData.php?action=list',
+											createAction: 'data/TableData.php?action=create',
+											updateAction: 'data/TableData.php?action=update',
+											deleteAction: 'data/TableData.php?action=delete'
+										},
+										fields: {
+											guid: {
+												key: true,
+												create: false,
+												edit: false,
+												list: false
+											},
+											date: {
+												title: 'Date',
+												width: '20%',
+												type: 'date'
+											},
+											description: {
+												title: 'Description',
+												width: '40%'
+											},
+											value_num: {
+												create: false,
+												edit: false,
+												list: false
+											},
+											value_denom: {
+												create: false,
+												edit: false,
+												list: false
+											},
+											value: {
+												title: 'Value',
+												width: '30%',
+												create: true,
+												edit: true
+											}
 										}
 									});
+
+									//Load person list from server
+									$('#TransactionsTable').jtable('load');
 								});
+								
 							</script>
 							<div class="row">
 							<div class="text-right">
