@@ -63,11 +63,11 @@ ORDER BY total_budget DESC, value DESC";
 	$rows = array();
 	while($row = pg_fetch_array($result,NULL,PGSQL_ASSOC))
 	{
-		if ($row['total_budget'] != 0){
+	#	if ($row['total_budget'] != 0){
 			$row['budget'] = number_format((float)($row['total_budget'] - $row['value']), 2, '.', '');
-		}else {
-			$row['budget'] = 0;
-		}
+	#	}else {
+	#		$row['budget'] = 0;
+	#	}
 		$rows[] = $row;
 	}
 	//Close database connection
