@@ -299,7 +299,7 @@
 		return (content);
 	  },
 	  barColors: function(row, series, type) {
-		console.log(series, row);
+//		console.log(series, row);
 		if(series.key == 'budget')
 		  {
 			if(row.y < 0)
