@@ -162,7 +162,7 @@
 					<div class="row">
 						<div class="panel panel-default">
 							<div class="panel-heading">
-								<h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i><b> Monthly Expense Breakdown</b></h3>
+								<h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i><b> Monthly Expense Breakdown </b>- $X remaining in budget</h3>
 							</div>
 							<div class="panel-body">
 								<div id="expense-bar"></div>
@@ -263,8 +263,9 @@
 	  element: 'expense-bar',
 	  data: <?php echo graph_data();?>,
 	  xkey: ['account'],
-	  ykeys: ['value','budget','placeholder'],
-	  labels: ['Account Value','Budget Remaining','Total Budget'],
+	  //We can't directly reference the total_budget key (or else a new bar would be created). Instead we populate programatically in our hoverCallback.
+	  ykeys: ['value','totalBudgetPlaceholder','budget'],			
+	  labels: ['Account Value','Total Budget','Budget Remaining'],
 	  resize: true,
 	  gridTextSize: 12,
 	  gridTextWeight: 'bold',
@@ -272,36 +273,43 @@
 	  preUnits: "$",
 	  stacked: true,
 	  hoverCallback: function (index, options, content, row) {
-		var colour = "#7a92a3";
-		if (options.data[index].budget < 0){
-			var colour = "#770000"; //red if over budget
-		}else{
-			var colour = "#006600"; //green if not over budget
+		
+		//red if over budget
+		if (options.data[index].budget < 0 && options.data[index].total_budget > 0){
+			var colour = "#770000"; 	
+			var budget="Over Budget By: -$"+-1*options.data[index].budget;
 		}
+		//purple if no budget is set
+		else if (options.data[index].budget < 0 && options.data[index].total_budget == 0){
+			var colour = "#800080";
+			var budget="No Budget Set: -$"+-1*options.data[index].budget;
+		}
+		//green if not over budget
+		else{
+			var colour = "#006600"; 	
+			var budget="Budget Remaining: $"+options.data[index].budget;
+		}
+		
 		var txtToReplace = $(content)[2].textContent;
 		var text = "<div class='morris-hover-point' style='color: #7a92a3'>Total Budget: $"+ options.data[index].total_budget + "</div>";
 		content = content.replace(txtToReplace, text);
 		var txtToReplace = $(content)[3].textContent;
-		if (options.data[index].budget < 0){
-			var budget="Over Budget By: -$"+-1*options.data[index].budget
-		}else{
-			var budget="Budget Remaining: $"+options.data[index].budget
-		};
 		var text = "<div class='morris-hover-point' style='color: "+colour+"'>" + budget + "</div>";
 		content = content.replace(txtToReplace, text);
 		return (content);
 	  },
 	  barColors: function(row, series, type) {
+		console.log(series, row);
 		if(series.key == 'budget')
 		  {
 			if(row.y < 0)
-			  return "#770000"; //over budget
+			  return "#770000"; //over budget red
 			else
-			  return "#7a92a3";  //under budget
+			  return "#7a92a3";  //under budget grey
 		  }
 		  else
 		  {
-			return "#0b62a4"; //standard colour
+			return "#0b62a4"; //standard colour blue
 		  }
 	  }
 	});
