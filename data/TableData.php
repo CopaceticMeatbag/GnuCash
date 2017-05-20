@@ -45,7 +45,7 @@ try
 
 		//Call Python Script to use PieCash Python binding for database changes.
 		//system('python create_transaction.py myargs1 myargs2 myargs3 myargs4', $retval);
-		//if ($retval){console.log"Yay";}
+		//if ($retval){console.log("Yay");}
 		//console.log("$retval");
 	}
 	else if($action == "update"){
