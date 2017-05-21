@@ -162,7 +162,7 @@
 					<div class="row">
 						<div class="panel panel-default">
 							<div class="panel-heading">
-								<h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i><b> Monthly Expense Breakdown </b>- $X remaining in budget</h3>
+								<h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i><b> Monthly Expense Breakdown </b>    $<?php echo budget_data('howsitgoin');?> remaining in budget</h3>
 							</div>
 							<div class="panel-body">
 								<div id="expense-bar"></div>
@@ -261,7 +261,7 @@
 	<!-- Custom Morris Charts JavaScript -->
 	Morris.Bar({
 	  element: 'expense-bar',
-	  data: <?php echo graph_data();?>,
+	  data: <?php echo budget_data("graph");?>,
 	  xkey: ['account'],
 	  //We can't directly reference the total_budget key (or else a new bar would be created). Instead we populate programatically in our hoverCallback.
 	  ykeys: ['value','totalBudgetPlaceholder','budget'],			
