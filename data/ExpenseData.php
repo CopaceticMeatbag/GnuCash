@@ -67,7 +67,7 @@ function budget_data($parameter){
 						INNER JOIN 
 							public.transactions ON public.splits.tx_guid = public.transactions.guid
 						WHERE 
-							public.Accounts.account_type = 'EXPENSE' 
+							public.Accounts.account_type = 'EXPENSE' and public.Accounts.name != 'Recreation'
 						AND 
 							public.transactions.post_date >= date_trunc('month', CURRENT_DATE)
 						GROUP BY 
@@ -133,7 +133,7 @@ function budget_data($parameter){
 		$result = pg_query($dbconn, $query);
 		
 		$total_budget_remaining = 0;
-		echo '<script>console.log("Your stuff here")</script>';
+//		echo '<script>console.log("Your stuff here")</script>';
 		while($row = pg_fetch_array($result,NULL,PGSQL_ASSOC))
 		{
 			$total_budget_remaining += number_format((float)($row['total_budget'] - $row['value']), 2, '.', '');
