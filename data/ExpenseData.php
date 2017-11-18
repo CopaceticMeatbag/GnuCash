@@ -3,7 +3,7 @@
 function money_saved($period){
 	
 	//Open database connection
-	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=password";
+	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=gnucash";
 	$dbconn = pg_connect($conn_string);
 	
 	//Define period to return
@@ -38,44 +38,105 @@ function money_saved($period){
 function budget_data($parameter){
 	
 	//Open database connection
-	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=password";
+	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=gnucash";
 	$dbconn = pg_connect($conn_string);
 	
 	if ($parameter == "graph"){
 		#Iterate through the list of Expense Accounts 
-		$query = "SELECT 
-						COALESCE(t1.account,t2.account) AS account, COALESCE(t1.budget,t2.value,0) AS total_budget, COALESCE(t2.value,0) AS value
-					FROM
-						(SELECT 
-							public.accounts.name AS account, round(public.budget_amounts.amount_num::decimal/public.budget_amounts.amount_denom::decimal,2) AS budget
-						FROM 
-							public.budget_amounts 
-						INNER JOIN 
-							public.accounts ON public.budget_amounts.account_guid = public.accounts.guid 
-						WHERE 
-							public.accounts.account_type = 'EXPENSE' 
-						AND 
-							public.budget_amounts.period_num = date_part('month', CURRENT_DATE)
-						) t1
-					FULL JOIN
-						(SELECT 
-							public.Accounts.name AS account, round((SUM(public.Splits.value_num)/AVG(public.accounts.commodity_scu)),2) AS value
-						FROM 
-							public.Accounts 
-						INNER JOIN 
-							public.Splits ON public.Accounts.guid=public.Splits.account_guid 
-						INNER JOIN 
-							public.transactions ON public.splits.tx_guid = public.transactions.guid
-						WHERE 
-							public.Accounts.account_type = 'EXPENSE' and public.Accounts.name != 'Recreation'
-						AND 
-							public.transactions.post_date >= date_trunc('month', CURRENT_DATE)
-						GROUP BY 
-							public.accounts.name
-						) t2
-					ON
-						t1.account = t2.account
-					ORDER BY total_budget DESC, value DESC";
+		$query = "
+SELECT 
+	COALESCE(t1.account,t2.account) AS account, COALESCE(t1.budget,t2.value,0) AS total_budget, COALESCE(t2.value,0) AS value
+FROM
+	(SELECT
+		endtable.account as account, endtable.budget as budget
+	FROM
+		(SELECT 
+				public.accounts.name AS account, round(public.budget_amounts.amount_num::decimal/public.budget_amounts.amount_denom::decimal,2) AS budget, public.accounts.parent_guid as parent
+		FROM 
+				public.budget_amounts 
+		INNER JOIN 
+			public.accounts ON public.budget_amounts.account_guid = public.accounts.guid
+		WHERE 
+			public.accounts.account_type = 'EXPENSE'
+		AND 
+			public.budget_amounts.period_num = date_part('month', CURRENT_DATE)
+		AND 
+			public.accounts.parent_guid = '9bf599dccbf9b17fd779d609de5d4c24'
+		UNION
+		SELECT
+			public.accounts.name as account, SUM(t1.budget) as budget, public.accounts.parent_guid as parent
+		FROM
+			(SELECT 
+				public.accounts.name AS account, round(public.budget_amounts.amount_num::decimal/public.budget_amounts.amount_denom::decimal,2) AS budget, public.accounts.parent_guid as parent
+			FROM 
+				public.budget_amounts 
+			INNER JOIN 
+				public.accounts ON public.budget_amounts.account_guid = public.accounts.guid
+			WHERE 
+				public.accounts.account_type = 'EXPENSE'
+			AND 
+				public.budget_amounts.period_num = date_part('month', CURRENT_DATE)
+			ORDER BY budget DESC
+			 ) t1
+		INNER JOIN
+			public.accounts ON t1.parent = public.accounts.guid
+		WHERE
+			t1.parent != '9bf599dccbf9b17fd779d609de5d4c24'
+		GROUP BY t1.parent, public.accounts.name, public.accounts.parent_guid
+		) endtable
+	) t1
+FULL JOIN
+	(SELECT
+		endtable.account as account, endtable.value as value
+	FROM
+		(SELECT 
+			public.Accounts.name AS account, round((SUM(public.Splits.value_num)/AVG(public.accounts.commodity_scu)),2) AS value, public.accounts.parent_guid as parent
+		FROM 
+			public.Accounts 
+		INNER JOIN 
+			public.Splits ON public.Accounts.guid=public.Splits.account_guid 
+		INNER JOIN 
+			public.transactions ON public.splits.tx_guid = public.transactions.guid
+		WHERE 
+			public.Accounts.account_type = 'EXPENSE' and public.Accounts.name != 'Recreation'
+		AND 
+			public.transactions.post_date >= date_trunc('month', CURRENT_DATE)
+		AND 
+			public.accounts.parent_guid = '9bf599dccbf9b17fd779d609de5d4c24'
+		GROUP BY 
+			public.accounts.name, public.accounts.parent_guid
+		UNION
+		SELECT
+			public.accounts.name as account, SUM(t1.value) as value, public.accounts.parent_guid as parent
+		FROM
+			(SELECT 
+				public.Accounts.name AS account, round((SUM(public.Splits.value_num)/AVG(public.accounts.commodity_scu)),2) AS value, public.accounts.parent_guid as parent
+			FROM 
+				public.Accounts 
+			INNER JOIN 
+				public.Splits ON public.Accounts.guid=public.Splits.account_guid 
+			INNER JOIN 
+				public.transactions ON public.splits.tx_guid = public.transactions.guid
+			WHERE 
+				public.Accounts.account_type = 'EXPENSE' and public.Accounts.name != 'Recreation'
+			AND 
+				public.transactions.post_date >= date_trunc('month', CURRENT_DATE)
+			GROUP BY 
+				public.accounts.name, public.accounts.parent_guid
+			) t1
+		 INNER JOIN
+			public.accounts ON t1.parent = public.accounts.guid
+		 WHERE
+			t1.parent != '9bf599dccbf9b17fd779d609de5d4c24'
+		 GROUP BY
+			t1.parent, public.accounts.name, public.accounts.parent_guid
+		) endtable
+) t2
+ON
+	t1.account = t2.account
+ORDER BY
+	total_budget DESC, value DESC";
+	
 		$result = pg_query($dbconn, $query);
 		
 		$rows = array();

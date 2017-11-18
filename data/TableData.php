@@ -9,7 +9,7 @@ try
 	}
 	
 	//Open database connection
-	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=password";
+	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=gnucash";
 	$dbconn = pg_connect($conn_string);
 
 	if($action == "list"){
