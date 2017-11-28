@@ -98,7 +98,7 @@ FULL JOIN
 		INNER JOIN 
 			public.transactions ON public.splits.tx_guid = public.transactions.guid
 		WHERE 
-			public.Accounts.account_type = 'EXPENSE' and public.Accounts.name != 'Recreation'
+			public.Accounts.account_type = 'EXPENSE' and public.Accounts.name != 'Recreation' and public.Accounts.name != 'Bank'
 		AND 
 			public.transactions.post_date >= date_trunc('month', CURRENT_DATE)
 		AND 
@@ -118,7 +118,7 @@ FULL JOIN
 			INNER JOIN 
 				public.transactions ON public.splits.tx_guid = public.transactions.guid
 			WHERE 
-				public.Accounts.account_type = 'EXPENSE' and public.Accounts.name != 'Recreation'
+				public.Accounts.account_type = 'EXPENSE' and public.Accounts.name != 'Recreation' and public.Accounts.name != 'Bank'
 			AND 
 				public.transactions.post_date >= date_trunc('month', CURRENT_DATE)
 			GROUP BY 
