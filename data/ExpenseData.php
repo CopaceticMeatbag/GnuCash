@@ -59,7 +59,7 @@ FROM
 		WHERE 
 			public.accounts.account_type = 'EXPENSE'
 		AND 
-			public.budget_amounts.period_num = date_part('month', CURRENT_DATE)
+			public.budget_amounts.period_num = (date_part('month', CURRENT_DATE)-1)
 		AND 
 			public.accounts.parent_guid = '9bf599dccbf9b17fd779d609de5d4c24'
 		UNION
@@ -75,7 +75,7 @@ FROM
 			WHERE 
 				public.accounts.account_type = 'EXPENSE'
 			AND 
-				public.budget_amounts.period_num = date_part('month', CURRENT_DATE)
+				public.budget_amounts.period_num = (date_part('month', CURRENT_DATE)-1)
 			ORDER BY budget DESC
 			 ) t1
 		INNER JOIN
@@ -170,7 +170,7 @@ ORDER BY
 					WHERE 
 						public.accounts.account_type = 'EXPENSE' 
 					AND 
-						public.budget_amounts.period_num = date_part('month', CURRENT_DATE)
+						public.budget_amounts.period_num = (date_part('month', CURRENT_DATE)-1)
 					) t1
 				FULL JOIN
 					(SELECT 
