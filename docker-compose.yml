@@ -1,0 +1,35 @@
+version: '3.3'
+
+services:
+  gnucashdb:
+    image: postgres:11.3
+    container_name: gnucashdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+    restart: always
+    environment: &postgres
+      POSTGRES_DB: gnucash
+      POSTGRES_USER: gnucash
+      POSTGRES_PASSWORD: gnucash
+
+  gnucashweb:
+    image: gnucashweb
+    build: ./docker/dev
+    container_name: gnucashweb
+    volumes:
+      - ./src:/var/www/html
+    ports:
+      - "80:80"
+    restart: always
+    depends_on:
+      - gnucashdb
+    environment:
+      <<: *postgres
+      DB_HOST: gnucashdb
+      DB_PORT: 5432
+
+volumes:
+    db:
+    src:

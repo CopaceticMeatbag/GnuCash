@@ -1,4 +1,5 @@
 <?php
+require_once('db.php');
 try
 {
 	//Getting records (listAction)
@@ -9,8 +10,7 @@ try
 	}
 	
 	//Open database connection
-	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=gnucash";
-	$dbconn = pg_connect($conn_string);
+	$dbconn = pg_connect(conn_string());
 
 	if($action == "list"){
 
@@ -66,4 +66,3 @@ catch(Exception $ex)
 	$jTableResult['Message'] = $ex->getMessage();
 	print json_encode($jTableResult);
 }
-?>

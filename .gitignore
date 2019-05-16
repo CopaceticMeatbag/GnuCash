@@ -1,2 +1,9 @@
+# docker db persistance
+db
+
 # IIS Config for Work#
 web.config
+
+# OS metadata
+.DS_Store
+Thumbs.db
