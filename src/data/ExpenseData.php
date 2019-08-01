@@ -1,10 +1,10 @@
 <?php
+require_once('db.php');
 
 function money_saved($period){
 	
 	//Open database connection
-	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=gnucash";
-	$dbconn = pg_connect($conn_string);
+	$dbconn = pg_connect(conn_string());
 	
 	//Define period to return
 	if ($period != "total"){
@@ -38,8 +38,7 @@ function money_saved($period){
 function budget_data($parameter){
 	
 	//Open database connection
-	$conn_string = "host=localhost port=5432 dbname=gnucash user=gnucash password=gnucash";
-	$dbconn = pg_connect($conn_string);
+	$dbconn = pg_connect(conn_string());
 	
 	if ($parameter == "graph"){
 		#Iterate through the list of Expense Accounts 
@@ -207,4 +206,3 @@ ORDER BY
 	}
 
 }
-?>

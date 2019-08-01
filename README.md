@@ -12,6 +12,17 @@ To use this website:
 * Clone the repo into the web server's default directory: `git clone https://github.com/CopaceticMeatbag/GnuCash.git`
 * Save your GnuCash data in PostgreSQL
 
+### Docker
+
+Development environment, with the src directory mapped to the web server container.
+Web server exposed on localhost:80 and database on localhost:5432.
+
+    docker-compose up
+
+Production web server image build from project root directory, will copy src into image.
+
+    docker build -f docker/prod/Dockerfile .
+
 ## Bugs and Issues
 
 There are currently quite a few bugs and missing features, these will be fixed and added over the next few weeks.
